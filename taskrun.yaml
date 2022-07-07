@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: test-task-run-
+spec:
+  taskRef:
+    name: gh-logs-watcher
+  params:
+    - name: OWNER
+      value: divyansh42
+    - name: REPO
+      value: podman-login
+    - name: JOB_ID
+      value: "6804851026"
+  workspaces:
+    - name: secrets
+      configMap:
+        name: token-secret
+    - name: gh-logger
+      persistentVolumeClaim:
+        claimName: run-logs

@@ -1,0 +1,38 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: gh-logs-watcher
+spec:
+  params:
+    - name: OWNER
+      type: string
+      description: Repository owner on which to watch the logs
+    - name: REPO
+      type: string
+      description: Repository on which to watch the logs
+    - name: JOB_ID
+      type: string
+      description: Job id of the job to watch the logs
+    - name: TOKEN_FILE_NAME
+      type: string
+      description: Token file name
+      default: token.txt
+  steps:
+    - name: get-gh-run-logs
+      image: fedora
+      workingDir: $(workspaces.secrets.path)
+      script: |
+        #!/usr/bin/env bash
+        # install gh cli
+        dnf install gh -y
+
+        # verify installation
+        gh --version
+        gh auth login --with-token < $(params.TOKEN_FILE_NAME)
+        gh auth status
+        gh run view --repo $(params.OWNER)/$(params.REPO) --job $(params.JOB_ID) --log | tee $(workspaces.gh-logger.path)/logs.txt
+
+  workspaces:
+    - name: secrets
+    - name: gh-logger
