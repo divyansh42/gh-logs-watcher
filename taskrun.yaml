@@ -14,8 +14,8 @@ spec:
       value: "6804851026"
   workspaces:
     - name: secrets
-      configMap:
-        name: token-secret
+      secret:
+        secretName: token-secret
     - name: gh-logger
       persistentVolumeClaim:
         claimName: run-logs
